@@ -336,131 +336,128 @@ p-8 space-y-6">
     </div>
 
    
-  {walletPanelOpen && 
-<div
-  className="absolute right-6 top-[25%] -translate-y-1/2
-  w-[340px] max-h-[85vh]
-  rounded-2xl
-  bg-white/10 backdrop-blur-2xl
-  border border-white/20
-  shadow-[0_0_40px_rgba(0,255,200,0.25)]
-  p-4 flex flex-col"
->
-
-  
-  <div className="flex justify-between items-center mb-3">
-    <h3 className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-purple-300">
-      {panelView === "home" && "Active Wallet"}
-      {panelView === "send" && "Send SOL"}
-      {panelView === "tokens" && "Tokens"}
-    </h3>
-
-    <button
+  {walletPanelOpen && (
+  <div className="fixed inset-0 z-[9999]">
+    {/* backdrop */}
+    <div
       onClick={() => {
         setWalletPanelOpen(false);
         setPanelView("home");
       }}
-      className="text-white/50 hover:text-white"
-    >
-      ✕
-    </button>
-  </div>
-
-  
-  {panelView === "home" && (
-    <>
-      
-      <div className="mb-4">
-        <p className="text-[10px] uppercase tracking-widest text-white/40">
-          Public Key
-        </p>
-        <p className="text-xs font-mono text-white break-all">
-          {selectedWallet}
-        </p>
-      </div>
-
-      
-      <div className="grid grid-cols-2 gap-3">
-        <button
-          onClick={() => setPanelView("send")}
-          className="py-2 rounded-xl 
-          bg-purple-500/20 hover:bg-purple-500/40 
-          transition text-xs"
-        >
-          Send
-        </button>
-
-        <button
-          onClick={() => setPanelView("tokens")}
-          className="py-2 rounded-xl 
-          bg-cyan-500/20 hover:bg-cyan-500/40 
-          transition text-xs"
-        >
-          Tokens
-        </button>
-        <button
-    onClick={() => setPanelView("swap")}
-    className="py-2 rounded-xl 
-    bg-emerald-500/20 hover:bg-emerald-500/40 
-    transition text-xs"
-  >
-    Swap
-  </button>
-      </div>
-    </>
-  )}
-
- 
-  {panelView === "send" && (
-    <>
-      <SendSol privateKey={selectedPrivateKey} isMainnet={isMainnet}/>
-
-      <button
-        onClick={() => setPanelView("home")}
-        className="mt-3 text-xs text-white/50 hover:text-white"
-      >
-        ← Back
-      </button>
-    </>
-  )}
-
- 
-  {panelView === "tokens" && (
-    <>
-      <TokenAccount publicKey={selectedWallet} isMainnet={isMainnet} />
-
-      <button
-        onClick={() => setPanelView("home")}
-        className="mt-3 text-xs text-white/50 hover:text-white"
-      >
-        ← Back
-      </button>
-    </>
-  )}
- 
-{panelView === "swap" && (
-  <>
-    <Swap
-      privateKey={selectedPrivateKey}
-      publicKey={selectedWallet}
+      className="absolute inset-0 bg-black/40 backdrop-blur-sm"
     />
 
-    <button
-      onClick={() => setPanelView("home")}
-      className="mt-3 text-xs text-white/50 hover:text-white"
+    {/* popup panel */}
+    <div
+      className="absolute top-16 right-6
+      w-[340px] max-h-[85vh]
+      rounded-2xl
+      bg-white/10 backdrop-blur-2xl
+      border border-white/20
+      shadow-[0_0_40px_rgba(0,255,200,0.25)]
+      p-4 flex flex-col"
     >
-      ← Back
-    </button>
-  </>
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-purple-300">
+          {panelView === "home" && "Active Wallet"}
+          {panelView === "send" && "Send SOL"}
+          {panelView === "tokens" && "Tokens"}
+          {panelView === "swap" && "Swap"}
+        </h3>
+
+        <button
+          onClick={() => {
+            setWalletPanelOpen(false);
+            setPanelView("home");
+          }}
+          className="text-white/50 hover:text-white"
+        >
+          ✕
+        </button>
+      </div>
+
+      {panelView === "home" && (
+        <>
+          <div className="mb-4">
+            <p className="text-[10px] uppercase tracking-widest text-white/40">
+              Public Key
+            </p>
+            <p className="text-xs font-mono text-white break-all">
+              {selectedWallet}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setPanelView("send")}
+              className="py-2 rounded-xl bg-purple-500/20 hover:bg-purple-500/40 transition text-xs"
+            >
+              Send
+            </button>
+
+            <button
+              onClick={() => setPanelView("tokens")}
+              className="py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/40 transition text-xs"
+            >
+              Tokens
+            </button>
+
+            <button
+              onClick={() => setPanelView("swap")}
+              className="py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/40 transition text-xs"
+            >
+              Swap
+            </button>
+          </div>
+        </>
+      )}
+
+      {panelView === "send" && (
+        <>
+          <SendSol privateKey={selectedPrivateKey} isMainnet={isMainnet} />
+
+          <button
+            onClick={() => setPanelView("home")}
+            className="mt-3 text-xs text-white/50 hover:text-white"
+          >
+            ← Back
+          </button>
+        </>
+      )}
+
+      {panelView === "tokens" && (
+        <>
+          <TokenAccount publicKey={selectedWallet} isMainnet={isMainnet} />
+
+          <button
+            onClick={() => setPanelView("home")}
+            className="mt-3 text-xs text-white/50 hover:text-white"
+          >
+            ← Back
+          </button>
+        </>
+      )}
+
+      {panelView === "swap" && (
+        <>
+          <Swap privateKey={selectedPrivateKey} publicKey={selectedWallet} />
+
+          <button
+            onClick={() => setPanelView("home")}
+            className="mt-3 text-xs text-white/50 hover:text-white"
+          >
+            ← Back
+          </button>
+        </>
+      )}
+
+      <p className="mt-4 text-[10px] text-white/30 text-center">
+        Wallet Actions
+      </p>
+    </div>
+  </div>
 )}
-
-  {/* footer */}
-  <p className="mt-4 text-[10px] text-white/30 text-center">
-    Wallet Actions
-  </p>
-</div>
-
-}
+  <p className="text-white/50 absolute bottom-19">*click on the generated wallets "div" to set that as current wallet*</p>
   </div>
   
 );

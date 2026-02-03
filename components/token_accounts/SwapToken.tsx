@@ -194,7 +194,7 @@ export default function Swap({privateKey,publicKey}:{privateKey:string,publicKey
           onChange={(e) => handleSellTokenChange(e.target.value)}
         >
           {TOKENS.filter(t => t.symbol !== buyToken.symbol).map((t) => (
-            <option key={t.symbol} value={t.symbol}>
+            <option key={t.symbol} value={t.symbol} className="bg-black text-white">
               {t.symbol}
             </option>
           ))}
@@ -223,7 +223,7 @@ export default function Swap({privateKey,publicKey}:{privateKey:string,publicKey
           onChange={(e) => handleBuyTokenChange(e.target.value)}
         >
           {TOKENS.filter(t => t.symbol !== sellToken.symbol).map((t) => (
-            <option key={t.symbol} value={t.symbol}>
+            <option key={t.symbol} value={t.symbol} className="bg-black text-white">
               {t.symbol}
             </option>
           ))}
