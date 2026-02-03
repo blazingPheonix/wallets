@@ -26,7 +26,7 @@ export default function Solana() {
   // }
   const [solIndex, setSolIndex] = useState<number>(0);
   const [solWallet, setSolWallet] = useState<solWalletType[]>([]);
-  const [showPrivate, setShowPrivate] = useState<Record<number, boolean>>({});
+  const [showPrivate, setShowPrivate] = useState<Record<string, boolean>>({});
   const [selectedWallet, setSelectedWallet] = useState<string>("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [panelView, setPanelView] = useState<"home" | "send" | "tokens" | "swap">("home");
@@ -34,6 +34,8 @@ export default function Solana() {
   const [isMainnet, setIsMainnet] = useState<boolean>(true);
   const [swapOpen, setSwapOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [seedPhrase, setSeedPhrase] = useState<string>("");
+
 
 
 
@@ -77,8 +79,14 @@ useEffect(() => {
     setSelectedPrivateKey(storedPrivate);
   }
 
+  const storedMnemonic = localStorage.getItem("wallet_mnemonics");
+  if (storedMnemonic) {
+    setSeedPhrase(JSON.parse(storedMnemonic).join(" "));
+  }
+
   setHydrated(true);
 }, []);
+
 
 const clearAllWallets = () => {
   if (!confirm("Are you sure you want to delete all wallets?")) return;
@@ -357,6 +365,7 @@ p-8 space-y-6">
       shadow-[0_0_40px_rgba(0,255,200,0.25)]
       p-4 flex flex-col"
     >
+      {/* header */}
       <div className="flex justify-between items-center mb-3">
         <h3 className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-purple-300">
           {panelView === "home" && "Active Wallet"}
@@ -376,46 +385,83 @@ p-8 space-y-6">
         </button>
       </div>
 
+      {/* HOME */}
       {panelView === "home" && (
-        <>
-          <div className="mb-4">
+        <div className="space-y-4">
+          {/* Public Key */}
+          <div>
             <p className="text-[10px] uppercase tracking-widest text-white/40">
               Public Key
             </p>
-            <p className="text-xs font-mono text-white break-all">
-              {selectedWallet}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs font-mono break-all">{selectedWallet}</p>
+              <button
+                onClick={() => navigator.clipboard.writeText(selectedWallet)}
+                className="text-[10px] px-2 py-1 rounded bg-white/10 hover:bg-white/20"
+              >
+                Copy
+              </button>
+            </div>
           </div>
 
+          {/* Seed Phrase */}
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-white/40">
+              Seed Phrase
+            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs font-mono text-yellow-300 break-all">
+                {showPrivate["seed"]
+                  ? seedPhrase
+                  : "•••••• •••••• •••••• •••••• •••••• ••••••"}
+              </p>
+              <button
+                onClick={() =>
+                  setShowPrivate((p) => ({ ...p, seed: !p.seed }))
+                }
+                className="text-[10px] px-2 py-1 rounded bg-white/10 hover:bg-white/20"
+              >
+                {showPrivate["seed"] ? "Hide" : "Show"}
+              </button>
+              <button
+                onClick={() => navigator.clipboard.writeText(seedPhrase)}
+                className="text-[10px] px-2 py-1 rounded bg-white/10 hover:bg-white/20"
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+
+          {/* actions */}
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => setPanelView("send")}
-              className="py-2 rounded-xl bg-purple-500/20 hover:bg-purple-500/40 transition text-xs"
+              className="py-2 rounded-xl bg-purple-500/20 hover:bg-purple-500/40 text-xs"
             >
               Send
             </button>
 
             <button
               onClick={() => setPanelView("tokens")}
-              className="py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/40 transition text-xs"
+              className="py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/40 text-xs"
             >
               Tokens
             </button>
 
             <button
               onClick={() => setPanelView("swap")}
-              className="py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/40 transition text-xs"
+              className="py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/40 text-xs"
             >
               Swap
             </button>
           </div>
-        </>
+        </div>
       )}
 
+      {/* SEND */}
       {panelView === "send" && (
         <>
           <SendSol privateKey={selectedPrivateKey} isMainnet={isMainnet} />
-
           <button
             onClick={() => setPanelView("home")}
             className="mt-3 text-xs text-white/50 hover:text-white"
@@ -425,10 +471,10 @@ p-8 space-y-6">
         </>
       )}
 
+      {/* TOKENS */}
       {panelView === "tokens" && (
         <>
           <TokenAccount publicKey={selectedWallet} isMainnet={isMainnet} />
-
           <button
             onClick={() => setPanelView("home")}
             className="mt-3 text-xs text-white/50 hover:text-white"
@@ -438,10 +484,10 @@ p-8 space-y-6">
         </>
       )}
 
+      {/* SWAP */}
       {panelView === "swap" && (
         <>
           <Swap privateKey={selectedPrivateKey} publicKey={selectedWallet} />
-
           <button
             onClick={() => setPanelView("home")}
             className="mt-3 text-xs text-white/50 hover:text-white"
@@ -457,8 +503,6 @@ p-8 space-y-6">
     </div>
   </div>
 )}
-  <p className="text-white/50 absolute bottom-19">*click on the generated wallets "div" to set that as current wallet*</p>
-  </div>
-  
+</div>
 );
 }
