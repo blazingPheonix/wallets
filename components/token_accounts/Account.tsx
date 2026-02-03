@@ -2,7 +2,7 @@
 
 import { Connection, GetProgramAccountsFilter, PublicKey } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Metaplex } from "@metaplex-foundation/js";
 
 export default function TokenAccount({
@@ -19,12 +19,20 @@ export default function TokenAccount({
   const rpcEndpoint = isMainnet
     ? process.env.NEXT_PUBLIC_MAINNET_URL
     : process.env.NEXT_PUBLIC_DEVNET_URL;
-  if(!rpcEndpoint) return ;
-  const connection = new Connection(rpcEndpoint);
+    console.log("rpc Endpoint",rpcEndpoint);
+  if(!rpcEndpoint) return null;
+  const connection = useMemo(
+  () => new Connection(rpcEndpoint),
+  [rpcEndpoint]
+);
+
 
   const fetchBalance = async () => {
     try {
       const walletPubkey = new PublicKey(publicKey);
+      
+      // const walletPubkey = new PublicKey('AgBiB9AorgWcyVCiTdWvwt4UQDfFJUJgUrqib3sp88Td');
+
       const lamports = await connection.getBalance(walletPubkey);
       const sol = lamports / 1e9;
       setBalance(sol);
@@ -60,13 +68,19 @@ export default function TokenAccount({
         );
 
         await fetchBalance();
-
+        console.log("account is ",accounts);
         const result = await Promise.all(
           accounts.map(async (acc) => {
-            const info = acc.account.data.parsed.info;
+            
+            const data = acc.account.data;
+
+          if (!("parsed" in data)) return null;
+
+const info = data.parsed.info;
+            // const info = acc.account.data.parsed.info;
             const mint = new PublicKey(info.mint);
             const amount = info.tokenAmount.uiAmount;
-
+            console.log("this is acc",acc);
             try {
               const metadata = await metaplex.nfts().findByMint({
                 mintAddress: mint,

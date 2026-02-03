@@ -52,10 +52,10 @@ export default function SendSol({ privateKey,isMainnet }: { privateKey: string,i
 
       const recipient = address(receiverAddress);
 
-      const LAMPORTS_PER_SOL = 1_000_000_000n;
-      const transferAmount = lamports(
-        BigInt(Math.floor(Number(amount) * 1_000_000_000))
-      );
+      const LAMPORTS_PER_SOL = BigInt(1_000_000_000);
+const transferAmount = lamports(
+  BigInt(Math.floor(Number(amount) * 1_000_000_000))
+);
 
       const transferInstruction = getTransferSolInstruction({
         source: sender,
@@ -77,12 +77,20 @@ export default function SendSol({ privateKey,isMainnet }: { privateKey: string,i
       );
 
       const signedTransaction =
-        await signTransactionMessageWithSigners(transactionMessage);
+  await signTransactionMessageWithSigners(transactionMessage);
 
-      await sendAndConfirmTransactionFactory({ rpc,rpcSubscriptions })(
-        signedTransaction,
-        { commitment: "confirmed" }
-      );
+// tell TS: this tx uses blockhash lifetime
+const signedTxWithBlockhash = signedTransaction as typeof signedTransaction & {
+  lifetimeConstraint: {
+    lastValidBlockHeight: bigint;
+  };
+};
+
+await sendAndConfirmTransactionFactory({ rpc, rpcSubscriptions })(
+  signedTxWithBlockhash,
+  { commitment: "confirmed" }
+);
+
 
       const transactionSignature =
         getSignatureFromTransaction(signedTransaction);
